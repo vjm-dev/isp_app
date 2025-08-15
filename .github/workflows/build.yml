@@ -1,0 +1,141 @@
+name: Test and build application
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v4
+      
+    - name: Install Linux dependencies
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libglu1-mesa libgtk-3-dev pkg-config
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: stable
+        cache: true
+    
+    - name: Cache Flutter dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.pub-cache
+          /opt/hostedtoolcache/flutter
+        key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-flutter-
+
+    - name: Install dependencies
+      run: flutter pub get
+
+    - name: Analyze code
+      run: flutter analyze
+
+    - name: Run tests
+      run: flutter test
+
+    # Windows
+    - name: Build Windows executable
+      if: matrix.os == 'windows-latest'
+      run: flutter build windows --release
+
+    - name: Package Windows release
+      if: matrix.os == 'windows-latest'
+      run: |
+        mkdir windows_release
+        cp -r build/windows/x64/runner/Release/* windows_release/
+        7z a -r windows_release.zip windows_release/*
+      
+    - name: Upload Windows release
+      if: matrix.os == 'windows-latest'
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-release
+        path: windows_release.zip
+
+
+    # Linux
+    - name: Build Linux executable
+      if: matrix.os == 'ubuntu-latest'
+      run: flutter build linux --release
+
+    - name: Package Linux bundle
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        mkdir linux_release
+        cp -r build/linux/x64/release/bundle/* linux_release/
+        tar -czvf linux_release.tar.gz linux_release
+      
+    - name: Upload Linux bundle
+      if: matrix.os == 'ubuntu-latest'
+      uses: actions/upload-artifact@v4
+      with:
+        name: linux-release
+        path: linux_release.tar.gz
+
+
+    # Web
+    - name: Enable web support
+      if: matrix.os == 'ubuntu-latest'
+      run: flutter config --enable-web
+
+    - name: Build Flutter Web
+      if: matrix.os == 'ubuntu-latest'
+      run: flutter build web --release
+
+    - name: Package Web build
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        mkdir web_release
+        cp -r build/web/* web_release/
+        zip -r web_release.zip web_release
+      
+    - name: Upload Web build
+      if: matrix.os == 'ubuntu-latest'
+      uses: actions/upload-artifact@v4
+      with:
+        name: web-release
+        path: web_release.zip
+
+
+    # Android
+    - name: Build Android APK
+      if: matrix.os == 'ubuntu-latest'
+      run: flutter build apk --release
+
+    - name: Upload Android APK
+      if: matrix.os == 'ubuntu-latest'
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-apk
+        path: build/app/outputs/flutter-apk/app-release.apk
+
+
+    # macOS
+    - name: Build macOS app
+      if: matrix.os == 'macos-latest'
+      run: flutter build macos --release
+
+    - name: Package macOS app
+      if: matrix.os == 'macos-latest'
+      run: |
+        mkdir macos_release
+        cp -r build/macos/Build/Products/Release/*.app macos_release/
+        zip -r macos_release.zip macos_release
+      
+    - name: Upload macOS release
+      if: matrix.os == 'macos-latest'
+      uses: actions/upload-artifact@v4
+      with:
+        name: macos-release
+        path: macos_release.zip
