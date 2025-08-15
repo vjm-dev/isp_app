@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:isp_app/core/utils/validators.dart';
 import 'package:isp_app/presentation/blocs/auth/auth_bloc.dart';
 import 'package:isp_app/presentation/blocs/theme/theme_bloc.dart';
 import 'package:isp_app/presentation/pages/home/home_page.dart';
@@ -65,6 +66,11 @@ class LoginPage extends StatelessWidget {
                         onPressed: state is AuthLoading
                             ? null
                             : () {
+                                if (!Validators.email(_emailController.text)) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Enter a valid email address')));
+                                  return;
+                                }
                                 context.read<AuthBloc>().add(
                                       LoginRequested(
                                         _emailController.text,

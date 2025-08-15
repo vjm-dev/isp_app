@@ -9,6 +9,8 @@ class User extends Equatable {
   final double monthlyPayment;
   final double dataUsage;
   final double dataLimit;
+  final DateTime lastUpdated;
+
   bool get isGuest => id == 'user_guest';
 
   const User({
@@ -20,6 +22,7 @@ class User extends Equatable {
     required this.monthlyPayment,
     required this.dataUsage,
     required this.dataLimit,
+    required this.lastUpdated,
   });
 
   @override
@@ -32,6 +35,7 @@ class User extends Equatable {
         monthlyPayment,
         dataUsage,
         dataLimit,
+        lastUpdated,
       ];
 
   @override

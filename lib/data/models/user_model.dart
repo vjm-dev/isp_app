@@ -10,6 +10,7 @@ class UserModel extends Equatable {
   final double monthlyPayment;
   final double dataUsage;
   final double dataLimit;
+  final DateTime lastUpdated;
 
   const UserModel({
     required this.id,
@@ -20,6 +21,7 @@ class UserModel extends Equatable {
     required this.monthlyPayment,
     required this.dataUsage,
     required this.dataLimit,
+    required this.lastUpdated,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -32,6 +34,7 @@ class UserModel extends Equatable {
       monthlyPayment: json['monthlyPayment'].toDouble(),
       dataUsage: json['dataUsage'].toDouble(),
       dataLimit: json['dataLimit'].toDouble(),
+      lastUpdated: DateTime.parse(json['lastUpdated']),
     );
   }
 
@@ -45,6 +48,7 @@ class UserModel extends Equatable {
       'monthlyPayment': monthlyPayment,
       'dataUsage': dataUsage,
       'dataLimit': dataLimit,
+      'lastUpdated': lastUpdated.toIso8601String(),
     };
   }
 
@@ -58,6 +62,7 @@ class UserModel extends Equatable {
       monthlyPayment: monthlyPayment,
       dataUsage: dataUsage,
       dataLimit: dataLimit,
+      lastUpdated: lastUpdated,
     );
   }
 

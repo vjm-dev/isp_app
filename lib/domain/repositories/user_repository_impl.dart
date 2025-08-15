@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:isp_app/core/error/failures.dart';
+import 'package:isp_app/core/utils/cache_handlers.dart';
 import 'package:isp_app/data/models/datasources/local/local_data_source.dart';
 import 'package:isp_app/data/models/datasources/remote/remote_data_source.dart';
 import 'package:isp_app/domain/entities/user.dart';
@@ -19,7 +20,7 @@ class UserRepositoryImpl implements UserRepository {
     try {
       // First: try to get from the cache
       final cachedUser = await localDataSource.getCachedUser();
-      if (cachedUser != null && cachedUser.id == userId) {
+      if (cachedUser != null && cachedUser.id == userId && !CacheHandlers.isCacheExpired(cachedUser)) {
         return Right(cachedUser.toEntity());
       }
       
