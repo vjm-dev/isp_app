@@ -1,70 +1,60 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:isp_app/presentation/blocs/auth/auth_bloc.dart';
-import 'package:isp_app/presentation/blocs/theme/theme_bloc.dart';
+import 'package:get/get.dart';
+import 'package:isp_app/presentation/controllers/auth_controller.dart';
+import 'package:isp_app/presentation/controllers/theme_controller.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
-  final List<Widget>? actions;
   final bool showLogout;
 
   const CustomAppBar({
     super.key,
     required this.title,
-    this.actions,
     this.showLogout = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final themeController = Get.find<ThemeController>();
+    final authController = Get.find<AuthController>();
+
     return AppBar(
       title: Text(title),
       centerTitle: true,
       actions: [
-        BlocBuilder<ThemeBloc, ThemeState>(
-          builder: (context, state) {
-            return IconButton(
-              icon: Icon(
-                state.isDarkMode ? Icons.light_mode : Icons.dark_mode,
-              ),
-              onPressed: () {
-                context.read<ThemeBloc>().add(ToggleThemeEvent());
-              },
-            );
-          },
+        IconButton(
+          icon: Obx(() => Icon(
+            themeController.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+          )),
+          onPressed: themeController.toggleTheme,
         ),
         if (showLogout)
-          Tooltip(
-            message: 'Logout',
-            child: IconButton(
-              icon: const Icon(Icons.logout),
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text('Confirm logout'),
-                    content: const Text('Are you sure you want to log out?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text('Cancel'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          context.read<AuthBloc>().add(LogoutRequested());
-                        },
-                        child: const Text('Yes'),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Logout',
+            onPressed: () {
+              Get.dialog(
+                AlertDialog(
+                  title: const Text('Confirm logout'),
+                  content: const Text('Are you sure you want to log out?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Get.back(),
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Get.back();
+                        authController.logout();
+                      },
+                      child: const Text('Logout'),
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
-        ...?actions,
       ],
-      elevation: 2,
     );
   }
 

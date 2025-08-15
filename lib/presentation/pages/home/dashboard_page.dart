@@ -1,61 +1,60 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:isp_app/core/di/service_locator.dart';
+import 'package:get/get.dart';
 import 'package:isp_app/domain/entities/user.dart';
-import 'package:isp_app/domain/usecases/get_user_data.dart';
-import 'package:isp_app/presentation/blocs/auth/auth_bloc.dart';
-import 'package:isp_app/presentation/blocs/user/user_bloc.dart';
+import 'package:isp_app/presentation/controllers/user_controller.dart';
 import 'package:isp_app/presentation/widgets/custom_app_bar.dart';
 import 'package:isp_app/presentation/widgets/data_usage_card.dart';
 
 class DashboardPage extends StatelessWidget {
-  const DashboardPage({super.key});
+  final UserController _userController = Get.find();
+
+  DashboardPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Get authenticated user
-    final user = (context.read<AuthBloc>().state as AuthAuthenticated).user;
-    
-    // Initialize UserBloc
-    return BlocProvider(
-      create: (context) => UserBloc(getUserData: getIt<GetUserData>())
-        ..add(LoadUserData(user.id)),
-      child: Scaffold(
-        appBar: const CustomAppBar(
-          title: 'My account',
-          showLogout: true,
-        ),
-        body: BlocBuilder<UserBloc, UserState>(
-          builder: (context, state) {
-            if (state is UserLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is UserLoaded) {
-              final user = state.user;
-              return _buildDashboard(context, user);
-            } else if (state is UserError) {
-              return Center(child: Text(state.message));
-            }
-            return const Center(child: Text('Loading...'));
-          },
-        ),
+    return Scaffold(
+      appBar: CustomAppBar(
+        title: 'My Account',
+        showLogout: true,
       ),
+      body: Obx(() {
+        if (_userController.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        
+        if (_userController.user != null) {
+          return _buildDashboard(_userController.user!);
+        }
+        
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(_userController.errorMessage.value),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _userController.loadUserData,
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        );
+      }),
     );
   }
 
-  Widget _buildDashboard(BuildContext context, User user) {
-    final theme = Theme.of(context);
+  Widget _buildDashboard(User user) {
+    final theme = Theme.of(Get.context!);
     final colorScheme = theme.colorScheme;
-
+    
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          
           if (user.isGuest)
             _buildGuestWarning(),
-
-
+          
           Text(
             'Hi, ${user.name}',
             style: TextStyle(
@@ -78,11 +77,11 @@ class DashboardPage extends StatelessWidget {
             total: user.dataLimit,
           ),
           const SizedBox(height: 30),
-          _buildInfoCard(context, 'Current billing', '\$${user.monthlyPayment}'),
+          _buildInfoCard('Current billing', '\$${user.monthlyPayment}'),
           const SizedBox(height: 15),
-          _buildInfoCard(context, 'Next billing', '15 each month'),
+          _buildInfoCard('Next billing', '15 each month'),
           const SizedBox(height: 15),
-          _buildInfoCard(context, 'Account status', 'Up to date'),
+          _buildInfoCard('Account status', 'Up to date'),
           const SizedBox(height: 30),
           ElevatedButton(
             onPressed: () {},
@@ -96,8 +95,8 @@ class DashboardPage extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoCard(BuildContext context, String title, String value) {
-    final theme = Theme.of(context);
+  Widget _buildInfoCard(String title, String value) {
+    final theme = Theme.of(Get.context!);
     final colorScheme = theme.colorScheme;
     
     return Card(
@@ -132,6 +131,7 @@ class DashboardPage extends StatelessWidget {
   Widget _buildGuestWarning() {
     return Container(
       padding: const EdgeInsets.all(12),
+      margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
         color: const Color(0xFFFFCF40),
         borderRadius: BorderRadius.circular(8),

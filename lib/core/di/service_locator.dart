@@ -1,45 +1,41 @@
-import 'package:get_it/get_it.dart';
-import 'package:isp_app/data/models/datasources/local/local_data_source.dart';
-import 'package:isp_app/data/models/datasources/local/local_data_source_impl.dart';
-import 'package:isp_app/data/models/datasources/remote/remote_data_source.dart';
-import 'package:isp_app/data/models/datasources/remote/remote_data_source_impl.dart';
-import 'package:isp_app/domain/repositories/auth_repository_impl.dart';
+import 'package:get/get.dart';
 import 'package:isp_app/domain/repositories/auth_repository.dart';
+import 'package:isp_app/domain/repositories/auth_repository_impl.dart';
 import 'package:isp_app/domain/repositories/user_repository.dart';
 import 'package:isp_app/domain/repositories/user_repository_impl.dart';
 import 'package:isp_app/domain/usecases/get_user_data.dart';
 import 'package:isp_app/domain/usecases/login_user.dart';
+import 'package:isp_app/presentation/controllers/auth_controller.dart';
+import 'package:isp_app/presentation/controllers/home_controller.dart';
+import 'package:isp_app/presentation/controllers/theme_controller.dart';
+import 'package:isp_app/presentation/controllers/user_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-final getIt = GetIt.instance;
 
 Future<void> setupLocator() async {
   // External dependencies
   final sharedPreferences = await SharedPreferences.getInstance();
-  getIt.registerSingleton<SharedPreferences>(sharedPreferences);
-
-  // Data sources
-  getIt.registerLazySingleton<RemoteDataSource>(() => RemoteDataSourceImpl());
-  getIt.registerLazySingleton<LocalDataSource>(
-    () => LocalDataSourceImpl(getIt<SharedPreferences>()),
-  );
+  Get.put<SharedPreferences>(sharedPreferences);
 
   // Repositories
-  getIt.registerLazySingleton<AuthRepository>(
-    () => AuthRepositoryImpl(
-      remoteDataSource: getIt(),
-      localDataSource: getIt(),
-    ),
-  );
-
-  getIt.registerLazySingleton<UserRepository>(
-    () => UserRepositoryImpl(
-      remoteDataSource: getIt(),
-      localDataSource: getIt(),
-    ),
-  );
+  Get.put<AuthRepository>(AuthRepositoryImpl(
+    remoteDataSource: Get.find(),
+    localDataSource: Get.find(),
+  ));
+  
+  Get.put<UserRepository>(UserRepositoryImpl(
+    remoteDataSource: Get.find(),
+    localDataSource: Get.find(),
+  ));
 
   // Use cases
-  getIt.registerLazySingleton(() => LoginUser(getIt()));
-  getIt.registerLazySingleton(() => GetUserData(getIt()));
+  Get.put(LoginUser(Get.find<AuthRepository>()));
+  Get.put(GetUserData(Get.find<UserRepository>()));
+
+  // Controllers
+  Get.put(ThemeController(), permanent: true);
+  Get.put(AuthController(Get.find<LoginUser>()), permanent: true);
+  Get.put(ThemeController(), permanent: true);
+  Get.put(AuthController(Get.find<LoginUser>()), permanent: true);
+  Get.put(UserController(Get.find<GetUserData>()), permanent: true);
+  Get.put(HomeController(), permanent: true);
 }
