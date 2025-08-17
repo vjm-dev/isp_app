@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
       themeMode: Get.find<ThemeController>().isDarkMode 
           ? ThemeMode.dark 
           : ThemeMode.light,
-      initialRoute: AppRoutes.SPLASH,
+      initialRoute: AppRoutes.splash,
       getPages: AppPages.pages,
       debugShowCheckedModeBanner: kDebugMode,
     );

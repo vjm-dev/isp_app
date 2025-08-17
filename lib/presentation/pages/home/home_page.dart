@@ -27,7 +27,7 @@ class HomePage extends StatelessWidget {
               const Text('Authentication required'),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () => Get.offAllNamed(AppRoutes.LOGIN),
+                onPressed: () => Get.offAllNamed(AppRoutes.login),
                 child: const Text('Go to login'),
               ),
             ],

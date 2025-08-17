@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:isp_app/domain/entities/data_usage.dart';
 
 class User extends Equatable {
   final String id;
@@ -7,8 +8,7 @@ class User extends Equatable {
   final String phone;
   final String planName;
   final double monthlyPayment;
-  final double dataUsage;
-  final double dataLimit;
+  final DataUsage dataUsage;
   final DateTime lastUpdated;
 
   bool get isGuest => id == 'user_guest';
@@ -21,7 +21,6 @@ class User extends Equatable {
     required this.planName,
     required this.monthlyPayment,
     required this.dataUsage,
-    required this.dataLimit,
     required this.lastUpdated,
   });
 
@@ -34,7 +33,6 @@ class User extends Equatable {
         planName,
         monthlyPayment,
         dataUsage,
-        dataLimit,
         lastUpdated,
       ];
 

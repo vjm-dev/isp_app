@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ThemeController extends GetxController {
-  final RxBool _isDarkMode = false.obs;
+  final RxBool _isDarkMode = true.obs;
 
   bool get isDarkMode => _isDarkMode.value;
 

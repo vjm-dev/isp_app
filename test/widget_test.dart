@@ -9,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:isp_app/core/utils/cache_handlers.dart';
 import 'package:isp_app/core/utils/validators.dart';
 import 'package:isp_app/data/models/user_model.dart';
+import 'package:isp_app/domain/entities/data_usage.dart';
 
 void main() {
   test('email validator should return false for invalid emails', () {
@@ -31,8 +32,20 @@ void main() {
       phone: '+1234567890',
       planName: 'Internet 100 Mbps',
       monthlyPayment: 29.99,
-      dataUsage: 100.0,
-      dataLimit: 500.0,
+      dataUsage: DataUsage(
+        startDate: DateTime.now().subtract(Duration(days: 30)),
+        endDate: DateTime.now().add(Duration(days: 5)),
+        used: 325.6,
+        limit: 1000.0,
+        dailyUsage: List.generate(30, (index) {
+          final date = DateTime.now().subtract(Duration(days: 29 - index));
+          return DataConsumption(
+            date: date,
+            download: (index % 5 + 2.5),
+            upload: (index % 3 + 0.5),
+          );
+        }),
+      ),
       lastUpdated: DateTime.now().subtract(Duration(hours: 2)),
     );
     expect(CacheHandlers.isCacheExpired(oldUser), true);

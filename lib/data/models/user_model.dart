@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:isp_app/domain/entities/data_usage.dart';
 import 'package:isp_app/domain/entities/user.dart';
 
 class UserModel extends Equatable {
@@ -8,8 +9,7 @@ class UserModel extends Equatable {
   final String phone;
   final String planName;
   final double monthlyPayment;
-  final double dataUsage;
-  final double dataLimit;
+  final DataUsage dataUsage;
   final DateTime lastUpdated;
 
   const UserModel({
@@ -20,7 +20,6 @@ class UserModel extends Equatable {
     required this.planName,
     required this.monthlyPayment,
     required this.dataUsage,
-    required this.dataLimit,
     required this.lastUpdated,
   });
 
@@ -32,8 +31,18 @@ class UserModel extends Equatable {
       phone: json['phone'],
       planName: json['planName'],
       monthlyPayment: json['monthlyPayment'].toDouble(),
-      dataUsage: json['dataUsage'].toDouble(),
-      dataLimit: json['dataLimit'].toDouble(),
+      dataUsage: DataUsage(
+        startDate: DateTime.parse(json['data_usage']['start_date']),
+        endDate: DateTime.parse(json['data_usage']['end_date']),
+        used: json['data_usage']['used'].toDouble(),
+        limit: json['data_usage']['limit'].toDouble(),
+        dailyUsage: (json['data_usage']['daily_usage'] as List).map((e) => 
+          DataConsumption(
+            date: DateTime.parse(e['date']),
+            download: e['download'].toDouble(),
+            upload: e['upload'].toDouble(),
+          )).toList(),
+      ),
       lastUpdated: DateTime.parse(json['lastUpdated']),
     );
   }
@@ -46,8 +55,17 @@ class UserModel extends Equatable {
       'phone': phone,
       'planName': planName,
       'monthlyPayment': monthlyPayment,
-      'dataUsage': dataUsage,
-      'dataLimit': dataLimit,
+      'data_usage': {
+        'start_date': dataUsage.startDate.toIso8601String(),
+        'end_date': dataUsage.endDate.toIso8601String(),
+        'used': dataUsage.used,
+        'limit': dataUsage.limit,
+        'daily_usage': dataUsage.dailyUsage.map((e) => {
+          'date': e.date.toIso8601String(),
+          'download': e.download,
+          'upload': e.upload,
+        }).toList(),
+      },
       'lastUpdated': lastUpdated.toIso8601String(),
     };
   }
@@ -61,7 +79,6 @@ class UserModel extends Equatable {
       planName: planName,
       monthlyPayment: monthlyPayment,
       dataUsage: dataUsage,
-      dataLimit: dataLimit,
       lastUpdated: lastUpdated,
     );
   }
@@ -75,6 +92,6 @@ class UserModel extends Equatable {
         planName,
         monthlyPayment,
         dataUsage,
-        dataLimit,
+        lastUpdated,
       ];
 }

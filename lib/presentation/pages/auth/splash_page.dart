@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:isp_app/core/routes/app_pages.dart';
 import 'package:isp_app/presentation/controllers/auth_controller.dart';
 
 class SplashPage extends StatelessWidget {
@@ -9,7 +10,15 @@ class SplashPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Future.microtask(() => _authController.checkAuthStatus());
+    Future.microtask(() async {
+      await _authController.checkAuthStatus();
+      
+      if (_authController.user == null) {
+        Get.offAllNamed(AppRoutes.login);
+      } else {
+        Get.offAllNamed(AppRoutes.dashboard);
+      }
+    });
     
     return Scaffold(
       body: Center(

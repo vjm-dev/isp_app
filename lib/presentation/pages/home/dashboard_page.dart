@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:isp_app/domain/entities/user.dart';
-import 'package:isp_app/presentation/controllers/user_controller.dart';
+import 'package:isp_app/presentation/controllers/auth_controller.dart';
+import 'package:isp_app/presentation/controllers/data_controller.dart';
 import 'package:isp_app/presentation/widgets/custom_app_bar.dart';
 import 'package:isp_app/presentation/widgets/data_usage_card.dart';
-
+import 'package:isp_app/presentation/widgets/usage_simulator.dart';
 class DashboardPage extends StatelessWidget {
-  final UserController _userController = Get.find();
+  final authController = Get.find<AuthController>();
+  final dataController = Get.find<DataController>();
 
   DashboardPage({super.key});
 
@@ -18,27 +21,15 @@ class DashboardPage extends StatelessWidget {
         showLogout: true,
       ),
       body: Obx(() {
-        if (_userController.isLoading.value) {
+        if (dataController.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
         }
         
-        if (_userController.user != null) {
-          return _buildDashboard(_userController.user!);
+        if (authController.user != null) {
+          return _buildDashboard(authController.user!);
         }
         
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(_userController.errorMessage.value),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _userController.loadUserData,
-                child: const Text('Retry'),
-              ),
-            ],
-          ),
-        );
+        return Center(child: Text('No user data'));
       }),
     );
   }
@@ -73,9 +64,13 @@ class DashboardPage extends StatelessWidget {
           ),
           const SizedBox(height: 30),
           DataUsageCard(
-            used: user.dataUsage,
-            total: user.dataLimit,
+            used: dataController.usage.value?.used ?? 0,
+            total: dataController.usage.value?.limit ?? 1,
           ),
+          const SizedBox(height: 20),
+          UsageSimulator(),
+          const SizedBox(height: 20),
+          _buildUsageHistory(dataController),
           const SizedBox(height: 30),
           _buildInfoCard('Current billing', '\$${user.monthlyPayment}'),
           const SizedBox(height: 15),
@@ -83,13 +78,6 @@ class DashboardPage extends StatelessWidget {
           const SizedBox(height: 15),
           _buildInfoCard('Account status', 'Up to date'),
           const SizedBox(height: 30),
-          ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              minimumSize: const Size.fromHeight(50),
-            ),
-            child: const Text('View contracted services'),
-          ),
         ],
       ),
     );
@@ -126,6 +114,35 @@ class DashboardPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  
+  Widget _buildUsageHistory(DataController controller) {
+    return Obx(() {
+      if (controller.usage.value == null) {
+        return const Center(child: CircularProgressIndicator());
+      }
+      
+      return Column(
+        children: [
+          const Text('Daily history'),
+          DataTable(
+            columns: const [
+              DataColumn(label: Text('Date')),
+              DataColumn(label: Text('Download (GB)')),
+              DataColumn(label: Text('Upload (GB)')),
+            ],
+            rows: controller.usage.value!.dailyUsage.map((usage) {
+              return DataRow(cells: [
+                DataCell(Text(DateFormat('dd/MM').format(usage.date))),
+                DataCell(Text(usage.download.toStringAsFixed(2))),
+                DataCell(Text(usage.upload.toStringAsFixed(2))),
+              ]);
+            }).toList(),
+          ),
+        ],
+      );
+    });
   }
 
   Widget _buildGuestWarning() {

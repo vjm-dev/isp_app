@@ -25,7 +25,7 @@ class DataUsageCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Data consumption',
+              'Data usage',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,

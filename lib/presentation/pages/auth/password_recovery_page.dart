@@ -43,13 +43,13 @@ class PasswordRecoveryPage extends StatelessWidget {
               height: 50,
               child: ElevatedButton(
                 onPressed: () => _authController.recoverPassword(_emailController.text),
-                child: const Text('Send Reset Link'),
+                child: const Text('Send reset link'),
               ),
             ),
             const SizedBox(height: 20),
             TextButton(
-              onPressed: () => Get.offNamed(AppRoutes.LOGIN),
-              child: const Text('Back to Login'),
+              onPressed: () => Get.offNamed(AppRoutes.login),
+              child: const Text('Back to login'),
             ),
           ],
         ),

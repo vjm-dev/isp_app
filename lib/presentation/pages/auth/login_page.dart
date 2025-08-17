@@ -71,7 +71,7 @@ class LoginPage extends StatelessWidget {
                 )),
                 const SizedBox(height: 20),
                 TextButton(
-                  onPressed: () => Get.toNamed(AppRoutes.PASSWORD_RECOVERY),
+                  onPressed: () => Get.toNamed(AppRoutes.passwordRecovery),
                   child: const Text('Forgot your password?'),
                 ),
               ],

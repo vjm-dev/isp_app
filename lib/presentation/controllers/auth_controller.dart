@@ -28,7 +28,7 @@ class AuthController extends GetxController {
         },
         (loggedInUser) {
           _user.value = loggedInUser;
-          Get.offAllNamed(AppRoutes.HOME);
+          Get.offAllNamed(AppRoutes.home);
         },
       );
     } catch (e) {
@@ -44,7 +44,7 @@ class AuthController extends GetxController {
     try {
       await Get.find<AuthRepository>().logout();
       _user.value = null;
-      Get.offAllNamed(AppRoutes.LOGIN);
+      Get.offAllNamed(AppRoutes.login);
     } catch (e) {
       Get.snackbar('Error', 'Logout failed: $e');
     } finally {
@@ -57,14 +57,14 @@ class AuthController extends GetxController {
     try {
       final result = await Get.find<AuthRepository>().checkAuthStatus();
       result.fold(
-        (failure) => Get.offAllNamed(AppRoutes.LOGIN),
+        (failure) => Get.offAllNamed(AppRoutes.login),
         (user) {
           _user.value = user;
-          Get.offAllNamed(AppRoutes.HOME);
+          Get.offAllNamed(AppRoutes.home);
         },
       );
     } catch (e) {
-      Get.offAllNamed(AppRoutes.LOGIN);
+      Get.offAllNamed(AppRoutes.login);
     } finally {
       isLoading.value = false;
     }
@@ -73,6 +73,9 @@ class AuthController extends GetxController {
   Future<void> recoverPassword(String email) async {
     isLoading.value = true;
     try {
+      // TODO: Implement password recovery responses
+
+
       // Password recovery simulation
       await Future.delayed(const Duration(seconds: 2));
       
@@ -82,7 +85,7 @@ class AuthController extends GetxController {
         snackPosition: SnackPosition.BOTTOM,
       );
       
-      Get.offNamed(AppRoutes.LOGIN);
+      Get.offNamed(AppRoutes.login);
     } catch (e) {
       Get.snackbar(
         'Error',

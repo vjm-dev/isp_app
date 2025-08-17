@@ -7,37 +7,37 @@ import 'package:isp_app/presentation/pages/home/dashboard_page.dart';
 import 'package:isp_app/presentation/pages/home/home_page.dart';
 
 abstract class AppRoutes {
-  static const SPLASH = '/';
-  static const LOGIN = '/login';
-  static const HOME = '/home';
-  static const DASHBOARD = '/dashboard';
-  static const PASSWORD_RECOVERY = '/password_recovery';
+  static const splash = '/';
+  static const login = '/login';
+  static const home = '/home';
+  static const dashboard = '/dashboard';
+  static const passwordRecovery = '/password_recovery';
 }
 
 class AppPages {
   static final pages = [
     GetPage(
-      name: AppRoutes.SPLASH,
+      name: AppRoutes.splash,
       page: () => SplashPage(),
       binding: SplashBinding(),
     ),
     GetPage(
-      name: AppRoutes.LOGIN,
+      name: AppRoutes.login,
       page: () => LoginPage(),
       binding: AuthBinding(),
     ),
     GetPage(
-      name: AppRoutes.HOME,
+      name: AppRoutes.home,
       page: () => HomePage(),
       binding: HomeBinding(),
     ),
     GetPage(
-      name: AppRoutes.DASHBOARD,
+      name: AppRoutes.dashboard,
       page: () => DashboardPage(),
       binding: DashboardBinding(),
     ),
     GetPage(
-      name: AppRoutes.PASSWORD_RECOVERY,
+      name: AppRoutes.passwordRecovery,
       page: () => PasswordRecoveryPage(),
     ),
   ];

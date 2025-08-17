@@ -3,6 +3,7 @@ import 'package:isp_app/core/error/failures.dart';
 import 'package:isp_app/data/models/datasources/local/local_data_source.dart';
 import 'package:isp_app/data/models/datasources/remote/remote_data_source.dart';
 import 'package:isp_app/data/models/user_model.dart';
+import 'package:isp_app/domain/entities/data_usage.dart';
 import 'package:isp_app/domain/repositories/auth_repository_impl.dart';
 
 class FakeRemoteDataSource implements RemoteDataSource {
@@ -24,14 +25,44 @@ class FakeRemoteDataSource implements RemoteDataSource {
       phone: '+1234567890',
       planName: 'Test Plan',
       monthlyPayment: 29.99,
-      dataUsage: 100.0,
-      dataLimit: 500.0,
+      dataUsage: DataUsage(
+        startDate: DateTime.now().subtract(Duration(days: 30)),
+        endDate: DateTime.now().add(Duration(days: 5)),
+        used: 325.6,
+        limit: 1000.0,
+        dailyUsage: List.generate(30, (index) {
+          final date = DateTime.now().subtract(Duration(days: 29 - index));
+          return DataConsumption(
+            date: date,
+            download: (index % 5 + 2.5),
+            upload: (index % 3 + 0.5),
+          );
+        }),
+      ),
       lastUpdated: DateTime.now(),
     );
   }
 
   @override
   Future<UserModel> getUserData(String userId) {
+    throw UnimplementedError();
+  }
+  
+  @override
+  Future get(String url) {
+    // TODO: implement get
+    throw UnimplementedError();
+  }
+  
+  @override
+  mockResponse(String url) {
+    // TODO: implement mockResponse
+    throw UnimplementedError();
+  }
+  
+  @override
+  Future post(String url, {Map<String, dynamic>? body}) {
+    // TODO: implement post
     throw UnimplementedError();
   }
 }
