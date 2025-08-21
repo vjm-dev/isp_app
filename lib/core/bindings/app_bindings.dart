@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:isp_app/presentation/controllers/auth_controller.dart';
+import 'package:isp_app/presentation/controllers/data_controller.dart';
 import 'package:isp_app/presentation/controllers/home_controller.dart';
 import 'package:isp_app/presentation/controllers/theme_controller.dart';
 import 'package:isp_app/presentation/controllers/user_controller.dart';
@@ -17,6 +18,7 @@ class SplashBinding extends Bindings {
   @override
   void dependencies() {
     Get.put(AuthController(Get.find()));
+    Get.put(DataController(Get.find()));
   }
 }
 
@@ -24,6 +26,7 @@ class AuthBinding extends Bindings {
   @override
   void dependencies() {
     Get.lazyPut(() => AuthController(Get.find()));
+    Get.lazyPut(() => DataController(Get.find()));
   }
 }
 
@@ -31,6 +34,7 @@ class HomeBinding extends Bindings {
   @override
   void dependencies() {
     Get.lazyPut(() => HomeController());
+    Get.lazyPut(() => DataController(Get.find()));
   }
 }
 
@@ -38,5 +42,6 @@ class DashboardBinding extends Bindings {
   @override
   void dependencies() {
     Get.lazyPut(() => UserController(Get.find()));
+    Get.lazyPut(() => DataController(Get.find()));
   }
 }

@@ -3,6 +3,7 @@ import 'package:isp_app/core/routes/app_pages.dart';
 import 'package:isp_app/domain/entities/user.dart';
 import 'package:isp_app/domain/repositories/auth_repository.dart';
 import 'package:isp_app/domain/usecases/login_user.dart';
+import 'package:isp_app/presentation/controllers/data_controller.dart';
 
 class AuthController extends GetxController {
   final LoginUser _loginUser;
@@ -26,8 +27,18 @@ class AuthController extends GetxController {
           errorMessage.value = failure.message;
           Get.snackbar('Error', failure.message);
         },
-        (loggedInUser) {
+        (loggedInUser) async {
           _user.value = loggedInUser;
+          
+          // Load data usage after successful login
+          try {
+            final dataController = Get.find<DataController>();
+            await dataController.loadDataUsage(loggedInUser.id);
+          } catch (e) {
+            errorMessage.value = 'Error loading data usage: $e';
+            Get.snackbar('Error', 'Error loading data usage: $e');
+          }
+
           Get.offAllNamed(AppRoutes.home);
         },
       );
@@ -58,8 +69,18 @@ class AuthController extends GetxController {
       final result = await Get.find<AuthRepository>().checkAuthStatus();
       result.fold(
         (failure) => Get.offAllNamed(AppRoutes.login),
-        (user) {
+        (user) async {
           _user.value = user;
+          
+          // Load data after a successful authentication check
+          try {
+            final dataController = Get.find<DataController>();
+            await dataController.loadDataUsage(user.id);
+          } catch (e) {
+            errorMessage.value = 'Error loading data usage: $e';
+            Get.snackbar('Error', 'Error loading data usage: $e');
+          }
+          
           Get.offAllNamed(AppRoutes.home);
         },
       );

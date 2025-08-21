@@ -15,12 +15,18 @@ class DataRepositoryImpl implements DataRepository {
     try {
       final response = await remoteDataSource.get(ApiEndpoints.userData(userId));
       
+      final dataUsage = response['data_usage'];
+      
+      if (dataUsage == null) {
+        throw Exception('Data usage not found in response');
+      }
+
       return DataUsage(
-        startDate: DateTime.parse(response['start_date']),
-        endDate: DateTime.parse(response['end_date']),
-        used: response['used'].toDouble(),
-        limit: response['limit'].toDouble(),
-        dailyUsage: (response['daily_usage'] as List).map((e) => 
+        startDate: DateTime.parse(dataUsage['start_date']),
+        endDate: DateTime.parse(dataUsage['end_date']),
+        used: dataUsage['used'].toDouble(),
+        limit: dataUsage['limit'].toDouble(),
+        dailyUsage: (dataUsage['daily_usage'] as List).map((e) => 
           DataConsumption(
             date: DateTime.parse(e['date']),
             download: e['download'].toDouble(),
@@ -34,9 +40,18 @@ class DataRepositoryImpl implements DataRepository {
 
   @override
   Future<void> simulateUsage(String userId, double amount) async {
-    await remoteDataSource.post(
-      ApiEndpoints.updateUsage(userId),
-      body: {'amount': amount}
-    );
+    try {
+      final response = await remoteDataSource.post(
+        ApiEndpoints.updateUsage(userId),
+        body: {"amount": amount}
+      );
+      
+      // Verify if went ok
+      if (response['status'] != 'success') {
+        throw Exception('Failed to update usage: ${response['message']}');
+      }
+    } catch (e) {
+      throw Exception('Failed to simulate usage: $e');
+    }
   }
 }

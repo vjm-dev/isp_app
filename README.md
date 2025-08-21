@@ -6,10 +6,8 @@ ISP application using Flutter with BLoC and Repository design patterns, with a b
 
 - [x] GetX plugin applied
 - [x] API data (Flutter frontend)
-- [ ] Usage simulator responses
+- [x] Backend: CodeIgniter or Symfony Framework
+- [x] DB: MySQL or MariaDB
+- [x] Usage simulator responses
 - [ ] Password recovery responses
 
-## TO BE TESTED:
-
-- [ ] Backend: CodeIgniter or Symfony Framework
-- [ ] DB: MySQL or MariaDB

@@ -63,7 +63,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
     if (useMocks) return _mockResponse(url);
     
     final response = await _connect.get(url);
-    if (response.statusCode != 200) {
+    if (response.statusCode != 200 && response.statusCode != 201) {
       throw Exception('GET Failed: ${response.statusCode}');
     }
     return response.body;
@@ -74,7 +74,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
     if (useMocks) return _mockResponse(url);
     
     final response = await _connect.post(url, body);
-    if (response.statusCode != 200) {
+    if (response.statusCode != 200 && response.statusCode != 201) {
       throw Exception('POST Failed: ${response.statusCode}');
     }
     return response.body;
@@ -130,12 +130,25 @@ class RemoteDataSourceImpl implements RemoteDataSource {
       return UserModel.fromJson(user);
     } else { // for release
       final response = await _connect.post(
-        ApiEndpoints.login(email),
-        {'password': password},
+        ApiEndpoints.login(),
+        {
+          'email': email,
+          'password': password
+        },
       );
       
+      if (response.statusCode == 401) {
+        throw Exception('Invalid email or password');
+      }
+      
+      if (response.statusCode == 403) {
+        throw Exception('This user is not authorized or is banned');
+      }
+
       if (response.statusCode != 200) {
-        throw Exception('Login error: ${response.statusCode}');
+        throw Exception('Login error: '
+          'Status code response is ${response.statusCode}'
+          'Check your connection or the server');
       }
       
       return UserModel.fromJson(response.body);

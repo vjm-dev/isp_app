@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:isp_app/core/error/failures.dart';
 import 'package:isp_app/data/models/datasources/local/local_data_source.dart';
 import 'package:isp_app/data/models/datasources/remote/remote_data_source.dart';
+import 'package:isp_app/data/models/user_model.dart';
 import 'package:isp_app/domain/repositories/auth_repository.dart';
 import 'package:isp_app/domain/entities/user.dart';
 
@@ -17,7 +18,9 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, User>> login(String email, String password) async {
     try {
-      final userModel = await remoteDataSource.login(email, password);
+      final response = await remoteDataSource.login(email, password);
+      final userMap = response.toJson();
+      final userModel = UserModel.fromJson(userMap);
       await localDataSource.cacheUser(userModel);
       return Right(userModel.toEntity());
     } catch (e) {
