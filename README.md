@@ -2,6 +2,10 @@
 
 ISP application using Flutter with BLoC and Repository design patterns, with a basic implementation including authentication and display of user data.
 
+## Architecture diagram
+
+<img src="arch_diagram.png" />
+
 ## TODO
 
 - [x] GetX plugin applied
