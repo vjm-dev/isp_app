@@ -137,6 +137,10 @@ class RemoteDataSourceImpl implements RemoteDataSource {
         },
       );
       
+      if (response.statusCode == 400) {
+        throw Exception('Email and password fields cannot be empty');
+      }
+
       if (response.statusCode == 401) {
         throw Exception('Invalid email or password');
       }
@@ -147,7 +151,7 @@ class RemoteDataSourceImpl implements RemoteDataSource {
 
       if (response.statusCode != 200) {
         throw Exception('Login error: '
-          'Status code response is ${response.statusCode}'
+          'Status code response is ${response.statusCode}. '
           'Check your connection or the server');
       }
       

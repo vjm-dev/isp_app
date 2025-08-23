@@ -28,10 +28,10 @@ class HomePage extends StatelessWidget {
       
       if (_authController.isAuthenticated) {
         // Load data when the user is authenticated
-        /*if (_authController.user != null && 
+        if (_authController.user != null && 
             _dataController.usage.value == null) {
           _dataController.loadDataUsage(_authController.user!.id);
-        }*/
+        }
         return DashboardPage();
       }
       

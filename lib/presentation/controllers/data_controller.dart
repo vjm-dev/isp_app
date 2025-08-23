@@ -25,14 +25,10 @@ class DataController extends GetxController {
   Future<void> addSimulatedUsage(double amount) async {
     final user = Get.find<AuthController>().user;
     if (user != null) {
-      // Guardar el estado actual para posible reversión
       final currentUsage = usage.value;
       
       if (currentUsage != null) {
-        // Actualización optimista local
         final newUsed = currentUsage.used + amount;
-        
-        // Actualizar el uso diario
         final now = DateTime.now();
         final today = DateTime(now.year, now.month, now.day);
         
@@ -41,7 +37,6 @@ class DataController extends GetxController {
         
         for (var daily in currentUsage.dailyUsage) {
           if (isSameDay(daily.date, today)) {
-            // Actualizar el día actual
             newDailyUsage.add(DataConsumption(
               date: daily.date,
               download: daily.download + amount,
@@ -53,7 +48,6 @@ class DataController extends GetxController {
           }
         }
         
-        // Si no existe registro para hoy, crear uno nuevo
         if (!todayUpdated) {
           newDailyUsage.add(DataConsumption(
             date: today,
@@ -62,7 +56,6 @@ class DataController extends GetxController {
           ));
         }
         
-        // Crear nuevo DataUsage con los valores actualizados
         usage.value = DataUsage(
           startDate: currentUsage.startDate,
           endDate: currentUsage.endDate,
@@ -71,16 +64,13 @@ class DataController extends GetxController {
           dailyUsage: newDailyUsage,
         );
         
-        // Sincronizar con el servidor en segundo plano
         try {
           await repository.simulateUsage(user.id, amount);
-          // Recargar para asegurar sincronización completa
           await loadDataUsage(user.id);
         } catch (e) {
-          // Revertir en caso de error
           usage.value = currentUsage;
-          error.value = 'Error al simular uso: $e';
-          Get.snackbar('Error', 'No se pudo actualizar el uso: $e');
+          error.value = 'Error simulating usage: $e';
+          Get.snackbar('Error', 'Could not update usage: $e');
         }
       }
     }
